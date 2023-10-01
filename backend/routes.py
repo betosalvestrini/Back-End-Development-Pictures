@@ -35,7 +35,14 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    """return array of  pictures url"""
+    pic_array = []
+    if data:
+        for pic in data:
+            if pic["pic_url"]:
+                pic_array.append(pic["pic_url"])
+        return jsonify(pic_array), 200
+    return {"message": "Internal server error"}, 500
 
 ######################################################################
 # GET A PICTURE
@@ -44,7 +51,12 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    """return json with picture info"""
+    if data:
+        for pic in data:
+            if pic["id"] == id:
+                return pic, 200
+    return {"message": "Picture not Found"}, 404
 
 
 ######################################################################
@@ -52,7 +64,14 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    """create a new pic in data"""
+    req_body = request.get_json()
+    for pic in data:
+        if pic["id"] == req_body["id"]:
+            return {"Message": f"picture with id {pic['id']} already present"}, 302
+    data.append(req_body)
+    return req_body, 201
+    
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +80,20 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    for i,pict in enumerate(data):
+        if pict['id']==id:
+            data[i]=request.json
+            return request.json, 200
+    return {"message": "picture not found"}, 404
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    for i,pict in enumerate(data):
+        if pict['id']==id:
+            temp=pict
+            data.pop(i)
+            return temp, 204
+    return {"message": "picture not found"}, 404
